@@ -38,7 +38,10 @@ enum class MainSection(val label: String) {
 // Contenedor principal de la app: mantiene fijos el encabezado global y la barra
 // de navegación inferior, cambiando únicamente el contenido de la sección activa.
 @Composable
-fun MainScaffold(modifier: Modifier = Modifier) {
+fun MainScaffold(
+    onArticleClick: (String) -> Unit = {},
+    modifier: Modifier = Modifier
+) {
     var selectedSection by remember { mutableStateOf(MainSection.INICIO) }
     // Hoisted aquí para conservar los datos del flujo "Nuevo pedido" entre pasos
     // y entre cambios de sección
@@ -72,6 +75,7 @@ fun MainScaffold(modifier: Modifier = Modifier) {
                 when (selectedSection) {
                     MainSection.INICIO -> HomeScreen(
                         onEmergencyClick = { selectedSection = MainSection.NUEVO },
+                        onArticleClick = onArticleClick,
                         modifier = Modifier.fillMaxSize()
                     )
                     MainSection.NUEVO -> CreateOrderFlowScreen(

@@ -6,4 +6,5 @@ object NavRoutes {
     const val REGISTER = "register"
     const val REGISTER_SUCCESS = "register_success"
     const val HOME = "home"
+    const val ARTICLE_DETAIL = "article_detail/{articleId}"
 }
