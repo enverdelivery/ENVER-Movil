@@ -19,7 +19,7 @@
 - [x] T02.7 — verif REAL: `BUILD SUCCESSFUL in 7s`, exit 0, 36 tareas (6 ejecutadas/30 up-to-date); log `%TEMP%\\opencode\\enver_assembleDebug_ft02.txt`
 - [x] T02.8 — verif REAL: git diff vs baseline f3e58cc: +37/−29 en app/src SOLO wiring/aprobado literales intactos; los literales demo viven ahora únicamente en SampleArticles (14/14 idénticos al backup)
 - [x] T02.9 — verif: esta tabla + Memoria.md actualizados
-- [ ] T02.10 Commit descriptivo + push a `origin/main` (sin --force) + verificación hash remoto — verif: `git ls-remote` == HEAD local.
+- [ ] T02.10 Commit descriptivo CREADO (`80bd1ea feat: add article detail screen with Home navigation (FT-02)`), push a `main` RECHAZADO por reglas del repositorio de GitHub (GH013: «Changes must be made through a pull request» sobre refs/heads/main; sin --force, commit conservado local; remoto sigue en f3e58cc). PENDIENTE: decisión del propietario (PR o ajuste de ruleset)
 
 > Limitación declarada permanente mientras no haya dispositivo: prueba visual del detalle (tap tarjeta, back, transición) queda PENDIENTE, no aprobada.
 
