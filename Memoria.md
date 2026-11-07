@@ -1,0 +1,99 @@
+# Memoria de ENVER
+
+> Regla de uso (constitución §A y AGENTS §1/§6): se lee al empezar cualquier tarea y se actualiza al terminar. Nunca datos sensibles. Máximo práctico: condensar; los detalles históricos viven en `docs/`.
+
+---
+
+## 1. Estado del proyecto
+
+| Fecha | Evento |
+|---|---|
+| 2026-10-29/31 | Desarrollo visual: etapas 1–8 registradas en `docs/CHANGELOG.md` (splash, login, registro, home, navegación, wizard de pedidos con mapa y cámara). Compilaciones acreditadas: `:app:compileDebugKotlin` y `:app:assembleDebug`. Sin emulador: nada probado en runtime. |
+| 2026-11-05 | **Checkpoint 2** (auditado y documentado): `docs/ENVER_CURRENT_STATE_AUDIT.md` (inventario real), `docs/ENVER_UI_BASELINE.md` (línea base visual), `docs/ENVER_SDD_MIGRATION_PROPOSAL.md` (propuesta de migración por etapas P0–P6, no autorizada aún). |
+| 2026-11-05 | **Checkpoint 3** (en curso): Git inicializado en raíz (rama `main`, sin commits ni staging — pendiente de aprobación humana para el primer commit); `.gitignore` reforzado con reglas nuevas conservando las existentes; estructura SDD documental creada (constitución, AGENTS, Memoria, CHECKLIST_PR, 4 plantillas, agentes, skills). **Estado: BORRADOR pendiente de revisión humana.** |
+| 2026-11-05 | **Checkpoint 3.4** (auditoría de referencia): informe `docs/ENVER_REFERENCE_SDD_ADAPTATION_AUDIT.md` — BORRADOR sin ratificar. MovilSDD inspeccionado en SOLO LECTURA (scripts nunca ejecutados): `specs/` con 5 features FT-00..FT-04 + plantilla de 7 secciones; `scripts/` es solo README stub (sin ejecutables); CI real en `ci.yml` (lint→test+kover→instrumented→CodeQL→build en `main`); 13 agents en el ref vs 10 en ENVER (paridad 1:1 en escritores y 3/4 revisores; enforcement técnico de ENVER ≥ ref). Hallazgo nuevo: disonancia terminológica `Rescatista`/`repartidor` (pendiente #10). Sin cambios en código, plantillas, agents ni Git. |
+| 2026-11-05 | **Checkpoint 3.5** (preparación final): (1) Identidad confirmada — raíz `C:\AndroidProject\Enver`, `rootProject.name = "Enver"`; namespace/applicationId `com.uttt.enverdelivery.app`; directorios `java/com/uttt.enverdelivery/`; las 20 clases Kotlin y 2 plantillas de test declaran `package com.example.app.*` (NO existe literal `com.example.enver` en el proyecto). (2) **Build FALLA**: `.\gradlew.bat :app:assembleDebug` → `:app:compileDebugKotlin FAILED` (1m 6s, exit 1; 30 tareas: 12 ejecutadas/18 up-to-date) — "Unresolved reference 'R'" en `ImageSource.kt:3,10,11` y `HomeScreen.kt:62,73`. Causa: `R` se genera bajo el namespace `com.uttt.enverdelivery.app`; `app/build.gradle.kts`/`AndroidManifest.xml`/`MainActivity.kt` modificados HOY 17:54–17:59 (fuera del agente, tras el último verde acreditado del 29–31 oct), dejando rotos los imports `com.example.app.R`. (3) Correcciones documentales aplicadas: Memoria §3 (titular alineado a decisiones operativas), §5 y fila 3.2 (permisos edit/bash/task), errata constitución §E.3 (`documentar esa`), AGENTS §7 (permisos revisores). (4) Inventario del primer commit propuesto (ver informe 3.5; sin `git add`/commit). **Compilación: FAIL — ver pendiente #11.** |
+| 2026-11-05 | **Checkpoint 3.6** (preparar FT-01 + remoto + inventario): estado confirmado SIN cambios (`main`, 0 commits, 0 staged, 87 untracked; `origin` NO existe; fuentes intactas — los 5 errores de `R` siguen presentes). Se creó el paquete de especificación `specs/FT-01-recuperar-compilacion/{spec,plan,tasks}.md` según las plantillas ENVER (14 secciones), con estado BORRADOR; nada implementado y nada aprobado. §4 actualizado: pendiente #11 re-escrito con la decisión D-A (mínima, 2 archivos) vs D-B (alineación completa, 23 archivos, recomendada) y R6 (manifest L39 `android:authorities="com.example.app.fileprovider"`); pendiente #12 = configurar `origin` y autorizar publicación. Remoto previsto registrado en §9. |
+| 2026-11-06 | **Checkpoint 3.7** (verificar cambio manual del propietario): (1) El cambio manual hecho 2026-11-06 13:24–13:37 fue MAYOR de lo declarado: las 21 clases (20 main + 2 plantillas de test) ya declaran `package com.uttt.enverdelivery.app.*`; `ImageSource.kt:3` ya importa `com.uttt.enverdelivery.app.R`; los 3 archivos de navegación están completos (package + imports). PERO quedó INCOMPLETO: 59 imports internos siguen en `com.example.app.*` en 14 archivos main (tema/objetos compartidos); `EnverGlobalHeader.kt` declara package con segmento DUPLICADO (`com.uttt.enverdelivery.app.app.ui.components.common`); `HomeScreen.kt` sigue sin import de `R` (usa `R.drawable` en 62/73); `ExampleInstrumentedTest.kt:22` mantiene literal `"com.example.enver"`; manifest L39 authority intacta (pendiente R6). (2) **Build re-ejecutado: FAIL** (`:app:compileDebugKotlin`, exit 1, 23 s; 30 tareas: 1 ejecutada/29 up-to-date; log en `%TEMP%\opencode\enver_assembleDebug_37.txt`): ~250 ocurrencias "Unresolved reference" — EnverGreen×59, `app`×57 (imports viejos), EnverTextMuted×54, EnverDarkGreen×24, EnverCardBg×15, EnverInputBg×14, EnverBadgeBg×8, etc., más "None of the following candidates" en HomeScreen 62/73. (3) Recomendación: **D-B es ahora la única coherente** (el header/test ya migraron; D-A exigiría revertir más archivos que avanzar). Spec/plan/tasks de FT-01 requieren actualización del estado, sin firmar. El agente NO modificó código/config/remotos. Compilación: FAIL — ver pendiente #11. |
+| 2026-11-06 | **Checkpoint 3.8** (alinear FT-01 con la Constitution + resolver R6): (1) Propietario autorizó la dirección técnica **D-B** por escrito (NO sustituye la aprobación formal). (2) **R6 resuelta TÉCNICAMENTE, sin tocar código**: la autoridad del FileProvider aparece SOLO en 3 líneas (`AndroidManifest.xml:39` = `com.example.app.fileprovider`; `CreateOrderFlowScreen.kt:478,618` = `"com.example.enver.fileprovider"`), o sea la cámara está ROTA en runtime HOY por la desalineación (getUriForFile no resolvería la autoridad); el mapeo `file_paths.xml` (`cache-path order_photos/`) COINCIDE con `File(context.cacheDir, "order_photos")` (`CreateOrderFlowScreen.kt:470`) y NO requiere cambios; alinear la autoridad no exige nada más (grep total sobre `app/**` sin build: solo esas 3 líneas). Recomendación: INCLUIR R6 (3 líneas). (3) **Conteo corregido por grep literal**: los residuales reales son **58 imports en 13 archivos** (no 59/14 como se registró en 3.7, cifra que venía del log del build): Home 9, MainScaffold 6, Login 6, WelcomeSuccess 6, Register 6, Flow 5, Step2 5, Step3 5, Welcome 3, Header 2, MainActivity 2, BottomNav 2, EnverImage 1. (4) Documentación actualizada (sin firmar nada): spec.md v2 (estado post-3.7, R1–R6 con estados, criterios ajustados, exclusiones de R6, riesgos de cámara, decisión D-B autorizada + IC técnico, plan de pruebas con greps de autoridad); plan.md v2 (estado real por archivo, D-B / D-A descartada, tabla de ya-editados por el propietario + pendientes exactos, greps de cierre, respaldo 14/15 archivos); tasks.md v2 (7 tareas: T1.2 = 58 imports + fix del header; T1.3 = solo import R en HomeScreen; T1.4 = solo literal del test; T1.5 nueva CONDICIONAL R6; T1.6 build; T1.7 cierre). (5) Cumplimiento de Constitution verificado (trazabilidad R↔T↔criterios; límites por tarea; preservación; aprobación humana NO suplantada; ninguna declaración de éxito sin evidencia). El agente NO tocó Kotlin/Gradle/manifest/recursos, NO ejecutó implementación ni build, NO firmó nada, NO hizo git/remotos, NO leyó secretos. Compilación: NO EJECUTADA en este checkpoint (prohibida por el pedido). Ver pendiente #11. |
+| 2026-11-06 | **FT-01 v2 IMPLEMENTADO (aprobación formal del propietario: D-B APROBADA, R6 INCLUIDA, 2026-11-06)**: T1.1 respaldo 15/15 en `%TEMP%\opencode\ft01-backup\` (git de partida: main, 0 commits, 90 untracked). T1.2: 58 imports `com.example.app` → `com.uttt.enverdelivery.app` en 13 .kt + package del header corregido (`...app.app.ui...` → `...app.ui...`). T1.3: `import com.uttt.enverdelivery.app.R` añadida en `HomeScreen.kt`. T1.4: literal del test `com.example.enver` → `com.uttt.enverdelivery.app`. T1.5 (R6): autoridad FileProvider unificada a `com.uttt.enverdelivery.app.fileprovider` en manifest L39 + `CreateOrderFlowScreen.kt:478,618`. **T1.6: `.\gradlew.bat :app:assembleDebug` → BUILD SUCCESSFUL, exit 0, 51 s, 36 tareas (11/25 up-to-date), APK `app\build\outputs\apk\debug\app-debug.apk` (21298637 B, 18:19:27)** — log `%TEMP%\opencode\enver_assembleDebug_ft01.txt`. Greps de cierre: `com\.example\.(app|enver)` = 0 en `app/**`; `\.app\.app\.` = 0; `\.fileprovider` = 3 authority idénticas (+ `android:name` del provider). Diff auditado: +64/−63 en 15 archivos, 0 líneas fuera de package/import/literal-de-autoridad/literal-de-test (`%TEMP%\opencode\ft01-implementation.diff`). Deuda NO introducida sino registrada: warnings de deprecación (Icons.AutoMirrored, Divider→HorizontalDivider) y aviso compileSdk 37.1 vs AGP — preexistentes. Limitación INTACTA: sin dispositivo → runtime de cámara (FileProvider/TakePicture), test instrumentado y capturas visuales NO verificados en ejecución (PENDIENTES). Sin commits/push/remoto (prohibidos por la aprobación). |
+
+## 2. Hechos comprobados (por inspección)
+
+- Aplicación de un solo módulo `:app`; Kotlin 2.2.10, AGP 9.2.1, Gradle 9.4.1, Compose BOM 2026.02.01, maps-compose 6.12.2, JDK toolchain 21 (`gradle/libs.versions.toml`, `gradle/wrapper/gradle-wrapper.properties`).
+- `MAPS_API_KEY` NO está definida en `gradle.properties` (verificado en Checkpoint 2 sin leer valores) → el mapa se renderiza vacío en runtime hasta que se provea la clave.
+- Estado del wizard creado con `remember` (no `rememberSaveable`) en `MainScaffold.kt:43,46` → se pierde con rotación/muerte de proceso; `currentStep` se reinicia al re-abrir la sección NUEVO (`CreateOrderFlowScreen.kt:107`).
+- Login/Registro navegan sin validar credenciales/campos (`AppNavHost.kt:34-37`).
+- No hay ningún test del proyecto (solo plantillas `ExampleUnitTest`/`ExampleInstrumentedTest`).
+- Sin repositorio Git antes del Checkpoint 3; sin `.opencode/`, `.specify/`, CI ni análisis estático antes del Checkpoint 3.
+- Identidad de paquetes MINADA (Checkpoint 3.5): namespace/applicationId `com.uttt.enverdelivery.app` + directorios `java/com/uttt.enverdelivery/`, pero las 22 clases declaran `package com.example.app.*`; `R` genera bajo el namespace, por lo que `import com.example.app.R` y los usos sin import fallan (pendiente #11). Usos de `R`: solo `ImageSource.kt:3,10,11` y `HomeScreen.kt:62,73` (dibujos `articulo_calculadora_casio`/`articulo_cartulina_plumon` de `res/drawable-nodpi/`; las PNG dentro de `java/.../images/` NO son recursos y son duplicadas de los dibujos).
+
+## 3. Decisiones operativas aplicadas (no sustituyen ratificación formal)
+
+> Ninguna decisión de esta tabla es funcional de producto ni equivale a la firma de la constitución; lo operativo se ejecutó con autorización del propietario en los Checkpoints 3.x. Las pendientes reales viven en §4.
+
+| Fecha | Decisión | Porqué |
+|---|---|---|
+| 2026-11-05 (Checkpoint 3, pendiente de ratificación formal por el usuario) | La constitución NO lleva espejo en raíz | Una única copia en `.specify/memory/constitution.md` elimina el riesgo de divergencia; AGENTS.md enlaza a ella |
+| 2026-11-05 | Agentes revisores con `permission: {edit, bash, task}: deny` real en OpenCode | OpenCode admite permisos de agente (documentación de OpenCode / skill `customize-opencode`); para revisores de solo lectura es barrera técnica real, no solo prompt. Para agentes escritores NO se declara enforcement técnico |
+| 2026-11-05 | `.gitignore` reforzado SIN eliminar reglas existentes | Se añadieron: `build/` (cubre módulos), `.kotlin/`, `.idea/` completa, secretos (`*.jks`, `*.keystore`, `keys.properties`, `keystore.properties`, `secrets.properties`, `.env*`, `signing/`, `*.p12/.pem/.pfx`), logs (`*.log`, `*.hprof`), `.opencode/node_modules/`, temporales |
+| 2026-11-05 | Git inicializado sin commits ni staging | Requisito del Checkpoint 3; la selección de archivos y el primer commit requieren revisión humana |
+
+## 4. Decisiones pendientes (NO son propuestas aprobadas)
+
+| # | Decisión | Origen |
+|---|---|---|
+| 1 | Sobrevivencia del borrador del pedido/paso/sección a rotación y muerte de proceso (cambio de comportamiento visible) | Checkpoint 2, propuesta P3 |
+| 2 | Persistencia del borrador o sesión (DataStore/otros) hasta que exista backend | Checkpoint 2 §9.2 |
+| 3 | Proveer `MAPS_API_KEY` y ejecutar las capturas visuales pendientes (mapa, cámara, controles) | Checkpoint 2 §9.3 |
+| 4 | Endurecimiento de release (minify, `allowBackup=false`, network config, CI) | Checkpoint 2 §9.4 |
+| 5 | Rutas type-safe y/o secciones como rutas reales (cambia backstack) | Checkpoint 2 §9.5 |
+| 6 | Ratificación humana de la constitución v1.0.0 | Checkpoint 3 |
+| 7 | Primer commit de Git: qué archivos se versionan (revisar listado sin seguimiento; decidir qué hace con `gradle.properties` y `AGENTS.md`/`Memoria.md`) | Checkpoint 3 |
+| 8 | Copia del informe de referencia MovilSDD a `docs/` o mantener referencia externa | Checkpoint 2 §9.10 |
+| 9 | Ubicación de `const val` de diseño y/o externalización de textos a recursos — NO iniciar sin spec | Checkpoint 2 (línea base §4) |
+| 10 | Terminología del dominio: `Rescatista` y `repartidor` coexisten en pantallas sin requisito que los distinga; resolver antes de redactar cualquier spec FT del dominio | Checkpoint 3.4 (grep de fuentes) |
+| 11 | Unificar identidad de paquetes (FT-01): la dirección técnica **D-B** quedó AUTORIZADA por el propietario el 2026-11-06 (Checkpoint 3.8, instrucción escrita); falta la aprobación formal de spec/plan/tasks (firmar/spec §14 + plan §0 + tasks §0). D-A descartada (revertir exigiría editar más de lo que queda). R6: recomendación fundada = INCLUIR la alineación de la autoridad del FileProvider en las 3 líneas que la contienen (`AndroidManifest.xml:39` + `CreateOrderFlowScreen.kt:478,618` → `com.uttt.enverdelivery.app.fileprovider`); hoy la cámara está ROTA en runtime por la desalineación (manifest `com.example.app.fileprovider` vs código `com.example.enver.fileprovider`); el mapeo de `file_paths.xml` ya coincide con `cacheDir` — la inclusión (sí/no) se marca por el propietario EN la aprobación formal | Checkpoint 3.5 (build FAIL) / 3.6 (spec FT-01) / 3.7 (verificación cambio manual) / 3.8 (R6 resuelta técnicamente) |
+| 12 | Configurar el remoto `origin` y autorizar la publicación: URL previsto `https://github.com/enverdelivery/ENVER-Movil.git` (definido por el propietario el 2026-11-05, Checkpoint 3.6; registrado aquí SIN credenciales). `origin` NO existe aún; configurarlo tras aprobar el inventario del primer commit; el momento del `push` requiere autorización explícita | Checkpoint 3.6 |
+
+## 5. Limitaciones conocidas
+
+- Sin emulador/dispositivo en el entorno de los Checkpoints 2–3: mapa, câmara, permisos, Geocoder y navegación NO están verificados en ejecución.
+- `currentStep` del wizard se reinicia al volver a la sección NUEVO (comportamiento actual documentado en la baseline; preservarlo o arreglarlo es la decisión pendiente #1).
+- Piezas documentales desviadas en Checkpoint 2: `docs/FRONTEND_ARCHITECTURE.md` está desincronizado (no refleja Step2/Step3 y dice "pasos 2–4 pendientes"); corregir es deuda documental cuando se toque ese área.
+- enforcement técnico: los permisos aplican solo a los agentes revisores (edit/bash/task "deny"); el resto de restricciones son de comportamiento (constitución §D).
+- El proyecto NO compila desde 2026-11-05 17:54–17:59 (renombrado externo): el último verde acreditado es del 29–31 oct (`docs/CHANGELOG.md`); hasta ejecutar el slice del pendiente #11, cualquier cambio visual tiene verificación de compilación BLOQUEADA.
+- Warning de entorno (no bloqueante, `%o` degradación no autorizada): AGP 9.2.1 advertido frente a compileSdk 37.1; `gradle.properties` Enver NO tiene `MAPS_API_KEY` (boolean-check 3.x, sin leer valores); `app/proguard-rules.pro` NO existe y release define `optimization.enable = false` sin fichero proguard (verificar antes de P6).
+
+## 6. Riesgos activos
+
+- `gradle.properties` es versionable y hoy NO contiene secretos; si en el futuro se agrega `MAPS_API_KEY` ahí, quedaría expuesta en commits. Alternativas: propiedad en `local.properties` (ignorada) o `gradle.properties.user` (ignorada); decidir antes de introducir la clave (pendiente #3/#7).
+- Cambios de dependencias pueden romper compilación por la pareja Kotlin 2.2.10 ↔ maps-compose 6.12.2 (documentada, motivo de la elección de versión por el propio proyecto en `CHANGELOG.md` Etapa 8).
+- Refactor de estado (P3) puede alterar conductas visibles; exige capturas antes/después.
+
+## 7. Phases P0–P6 (planificación PROPUESTA, no implementación autorizada)
+
+De `docs/ENVER_SDD_MIGRATION_PROPOSAL.md` §7. Criterios de salida verificables:
+
+| Fase | Alcance resumido | Criterio de salida verificable |
+|---|---|---|
+| P0 | Git + protección del estado inicial | `git log` con el commit inicial revisado por humano; `git check-ignore local.properties` OK; no quedarán secretos en el listado de archivos trackeados (`git ls-files`) |
+| P1 | Metodología SDD instalada | Constitución ratificada (tabla de Aprobación firmada); plantillas y agentes existen; AGENTS/Memoria/CHECKLIST_PR sin contradicciones (revisión humana) |
+| P2 | Comprobaciones de compilación y pruebas mínimas reales | `.\gradlew.bat :app:assembleDebug` verde reproducible y documentado; al menos 1 test real de proyecto pasando (no plantilla) |
+| P3 | Estado robusto del wizard | Comportamiento aprobado (#1) implementado; baseline visual comparada (capturas si hay dispositivo); gates verdes |
+| P4 | Autenticación real | Spec de autenticación aprobado y su verificación ejecutada según spec (requiere decisiones previas de datos/sesión) |
+| P5 | Pedidos y perfil con datos reales | Depende de backend/persistencia aprobados; cada pantalla es un slice propio |
+| P6 | Endurecimiento y automatización de calidad | Minify/allowBackup/CI/dependabot según decisión #4; las verificaciones automáticas existen y fallan cuando deben |
+
+**Ninguna fase está implementada ni autorizada.** Los códigos P0–P6 son de planificación, no identificadores FT-XX.
+
+## 8. Errores a evitar (lecciones)
+
+- Verificar es ejecutar: nunca reportar "verde/pasó/aprobado" sin evidencia real de ejecución.
+- No inyectar secretos ni aumentar permisos sin spec + aprobación.
+- No eliminar, mover ni renombrar pantallas/recursos al refactorizar estructura documental.
+
+## 9. Próximo checkpoint autorizado
+
+- **Pendiente de ratificación humana del Checkpoint 3** (constitución v1.0.0 + primer commit aprobado). Después: **Checkpoint 4 recomendado** = validar P0 (selección de archivos pasados a Git y commit aprobado) y decidir las decisiones pendientes #1/#3 antes de tocar el wizard (P3). Nada más está autorizado.
+- **Remoto previsto (NO configurado, NO autorizado para publicar)**: `https://github.com/enverdelivery/ENVER-Movil.git` — destino definido por el propietario (Checkpoint 3.6). La configuración efectiva de `origin` puede hacerse después de que el propietario apruebe el inventario del primer commit; el momento y la autorización del `push` primera (y de cualquier publicación) quedan PENDIENTES de aprobación humana explícita. Aquí NO se almacenan credenciales ni tokens.

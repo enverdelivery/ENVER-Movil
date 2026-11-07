@@ -1,0 +1,44 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Añadido en Checkpoint 3 (reglas nuevas; no se eliminó ni cambió ninguna existente):
+# Compilaciones locales en cualquier módulo (la regla /build solo cubría la raíz)
+build/
+.kotlin/
+# IDE completo (el bloque /idea/ individual anterior se conserva por trazabilidad)
+.idea/
+# Usuario local de Gradle
+gradle.properties.user
+# Secretos: nunca versionar claves ni tiendas de firma
+keys.properties
+keystore.properties
+secrets.properties
+.env
+.env.*
+*.keystore
+*.jks
+*.pem
+*.p12
+*.pfx
+signing/
+# Logs y dumps
+*.log
+*.hprof
+# Dependencias node locales (agéntes/skills de OpenCode en el futuro)
+.opencode/node_modules/
+# Copias temporales
+*.orig
+*.swp
