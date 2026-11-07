@@ -20,6 +20,7 @@ import com.uttt.enverdelivery.app.ui.components.common.EnverGlobalHeader
 import com.uttt.enverdelivery.app.ui.screens.createorder.CreateOrderFlowScreen
 import com.uttt.enverdelivery.app.ui.screens.createorder.CreateOrderUiState
 import com.uttt.enverdelivery.app.ui.screens.home.HomeScreen
+import com.uttt.enverdelivery.app.ui.screens.pedidos.PedidosScreen
 import com.uttt.enverdelivery.app.ui.theme.EnverBackground
 import com.uttt.enverdelivery.app.ui.theme.EnverTextMuted
 
@@ -82,7 +83,7 @@ fun MainScaffold(
                         uiState = createOrderState,
                         modifier = Modifier.fillMaxSize()
                     )
-                    MainSection.PEDIDOS -> SectionPlaceholder(sectionName = MainSection.PEDIDOS.label, modifier = Modifier.align(Alignment.Center))
+                    MainSection.PEDIDOS -> PedidosScreen(modifier = Modifier.fillMaxSize())
                     MainSection.PERFIL -> SectionPlaceholder(sectionName = MainSection.PERFIL.label, modifier = Modifier.align(Alignment.Center))
                 }
             }
