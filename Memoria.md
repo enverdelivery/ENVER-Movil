@@ -26,6 +26,7 @@
 
 ## 2. Hechos comprobados (por inspección)
 
+
 - Aplicación de un solo módulo `:app`; Kotlin 2.2.10, AGP 9.2.1, Gradle 9.4.1, Compose BOM 2026.02.01, maps-compose 6.12.2, JDK toolchain 21 (`gradle/libs.versions.toml`, `gradle/wrapper/gradle-wrapper.properties`).
 - `MAPS_API_KEY` NO está definida en `gradle.properties` (verificado en Checkpoint 2 sin leer valores) → el mapa se renderiza vacío en runtime hasta que se provea la clave.
 - Estado del wizard creado con `remember` (no `rememberSaveable`) en `MainScaffold.kt:43,46` → se pierde con rotación/muerte de proceso; `currentStep` se reinicia al re-abrir la sección NUEVO (`CreateOrderFlowScreen.kt:107`).
