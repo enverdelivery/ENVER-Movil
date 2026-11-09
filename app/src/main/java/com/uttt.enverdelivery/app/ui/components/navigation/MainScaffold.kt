@@ -93,6 +93,7 @@ fun MainScaffold(
                     )
                     MainSection.PEDIDOS -> PedidosScreen(modifier = Modifier.fillMaxSize())
                     MainSection.PERFIL -> PerfilScreen(modifier = Modifier.fillMaxSize())
+                    MainSection.PERFIL -> SectionPlaceholder(sectionName = MainSection.PERFIL.label, modifier = Modifier.align(Alignment.Center))
                 }
             }
         }
