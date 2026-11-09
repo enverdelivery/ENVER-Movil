@@ -1,6 +1,15 @@
-# specs/ — Features SDD (FT-01..FT-0X)
+# specs/ — Índice SDD (spec maestra · CI/CD · APIs · features FT-01..FT-0X)
 
 > Rector: `.specify/memory/constitution.md` + `AGENTS.md`. Referencia de formato: repo MovilSDD (solo lectura, `specs/README.md` + `specs/_template.md`).
+
+## Mapa de specs
+
+| Carpeta | Qué contiene | Estado |
+|---|---|---|
+| `ENVER-SISTEMA/` | **Spec maestra** del sistema completo (superficies [IMPL]/[PEND]/[POR DEFINIR], arquitectura, integraciones, criterios) | Aprobada como referencia viva (2026-11-08); no sustituye specs por feature |
+| `CI-CD/` | Controles de integración ([CONFIG] vs [PROP]) y paso mínimo para primer pipeline | Documento de alcance; NADA de pipeline implementado |
+| `APIs/` | Estructura/listado para specs por contrato de backend | **PENDIENTE de URL AWS con los contratos reales** (no se inventan endpoints) |
+| `FT-01..FT-03/` | Features concretos (spec/plan/tasks + evidencia por tarea) | FT-01 y FT-02 han sido implementados y verificados; FT-03 ha sido implementado |
 
 ## Estructura por feature (vigente desde FT-02)
 
