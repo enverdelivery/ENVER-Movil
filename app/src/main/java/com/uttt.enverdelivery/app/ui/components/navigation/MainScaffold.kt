@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,12 +39,24 @@ enum class MainSection(val label: String) {
 
 // Contenedor principal de la app: mantiene fijos el encabezado global y la barra
 // de navegación inferior, cambiando únicamente el contenido de la sección activa.
+// SeccionSolicitada: sección pedida desde fuera (p. ej. "Pedir" en FT-04 marca
+// PEDIDOS); se consume una vez vía LaunchedEffect para permitir usos repetidos.
 @Composable
 fun MainScaffold(
     onArticleClick: (String) -> Unit = {},
+    seccionSolicitada: MainSection? = null,
+    onSeccionConsumida: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var selectedSection by remember { mutableStateOf(MainSection.INICIO) }
+
+    LaunchedEffect(seccionSolicitada) {
+        if (seccionSolicitada != null) {
+            selectedSection = seccionSolicitada
+            onSeccionConsumida()
+        }
+    }
+
     // Hoisted aquí para conservar los datos del flujo "Nuevo pedido" entre pasos
     // y entre cambios de sección
     val createOrderState = remember { CreateOrderUiState() }
