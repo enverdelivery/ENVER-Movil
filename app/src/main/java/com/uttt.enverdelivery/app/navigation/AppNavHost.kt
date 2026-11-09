@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import com.uttt.enverdelivery.app.ui.components.navigation.MainScaffold
 import com.uttt.enverdelivery.app.ui.screens.auth.LoginScreen
 import com.uttt.enverdelivery.app.ui.screens.auth.RegisterScreen
+import com.uttt.enverdelivery.app.ui.screens.detail.ArticleDetailScreen
 import com.uttt.enverdelivery.app.ui.screens.onboarding.WelcomeSuccessScreen
 import com.uttt.enverdelivery.app.ui.screens.welcome.WelcomeScreen
 
@@ -55,7 +56,16 @@ fun AppNavHost(
         }
         composable(NavRoutes.HOME) {
             // Home y sus secciones comparten la barra inferior fija de MainScaffold
-            MainScaffold()
+            MainScaffold(
+                onArticleClick = navigationActions::navigateToArticleDetail
+            )
+        }
+        composable(NavRoutes.ARTICLE_DETAIL) { backStackEntry ->
+            // Detalle FT-02: push full-screen; volver = popBackStack (regresa a Home)
+            ArticleDetailScreen(
+                articleId = backStackEntry.arguments?.getString("articleId").orEmpty(),
+                onBackClick = navigationActions::returnFromDetail
+            )
         }
     }
 }

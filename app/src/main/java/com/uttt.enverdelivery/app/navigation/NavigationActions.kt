@@ -30,4 +30,13 @@ class NavigationActions(private val navController: NavHostController) {
             launchSingleTop = true
         }
     }
+
+    // Detalle de artículo (FT-02): push sobre Home; volver = popBackStack().
+    fun navigateToArticleDetail(articleId: String) {
+        navController.navigate(NavRoutes.ARTICLE_DETAIL.replace("{articleId}", articleId))
+    }
+
+    fun returnFromDetail() {
+        navController.popBackStack()
+    }
 }

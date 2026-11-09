@@ -1,6 +1,7 @@
 package com.uttt.enverdelivery.app.ui.screens.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -10,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,33 +49,15 @@ data class OrderItem(
 fun HomeScreen(
     onEmergencyClick: () -> Unit = {},
     onNavigateToNav: (String) -> Unit = {},
+    onArticleClick: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    var selectedTab by remember { mutableStateOf("Necesito algo") }
-    var selectedFilter by remember { mutableStateOf("Lo más solicitado") }
+    var selectedTab by rememberSaveable { mutableStateOf("Necesito algo") }
+    var selectedFilter by rememberSaveable { mutableStateOf("Lo más solicitado") }
     val scrollState = rememberScrollState()
 
-    // Pedidos existentes por sub-filtro (cada espacio se muestra según el selector activo)
-    val mostRequestedOrders = listOf(
-        OrderItem(
-            id = "1",
-            category = "Calculadora + Útiles",
-            title = "Calculadora científica Casio fx-991",
-            cost = "$45 MXN",
-            imageResId = R.drawable.articulo_calculadora_casio
-        ),
-        OrderItem(
-            id = "2",
-            category = "Papelería",
-            title = "Cartulina blanca + plumón negro",
-            cost = "$40 MXN",
-            is100PercentYours = true,
-            requesterName = "Alex Martinez",
-            rating = "4.9 · 14 rescates",
-            faculty = "TICs",
-            imageResId = R.drawable.articulo_cartulina_plumon
-        )
-    )
+    // Pedidos existentes por sub-filtro: fuente única en SampleArticles (FT-02)
+    val mostRequestedOrders = SampleArticles.mostRequested
     // Aún no se entregan datos de pedidos recientes: el espacio se conserva vacío
     val recentOrders = emptyList<OrderItem>()
 
@@ -257,7 +241,7 @@ fun HomeScreen(
                 )
             } else {
                 visibleOrders.forEach { item ->
-                    OrderCardVerticalFullWidth(order = item)
+                    OrderCardVerticalFullWidth(order = item, onClick = { onArticleClick(item.id) })
                 }
             }
         }
@@ -445,12 +429,14 @@ fun HomeScreen(
 
 // --- TARJETA VERTICAL DE ANCHO COMPLETO (APILADA) ---
 @Composable
-fun OrderCardVerticalFullWidth(order: OrderItem) {
+fun OrderCardVerticalFullWidth(order: OrderItem, onClick: () -> Unit = {}) {
     Card(
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = EnverCardBg),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -538,7 +524,7 @@ fun OrderCardVerticalFullWidth(order: OrderItem) {
                     }
 
                     Button(
-                        onClick = { },
+                        onClick = onClick,
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = EnverGreen),
                         modifier = Modifier.height(38.dp),
