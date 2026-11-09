@@ -52,6 +52,9 @@ import com.uttt.enverdelivery.app.ui.theme.EnverTheme
 // "Pedir" (FT-04): registra el artículo como pedido local en memoria (demo
 // provisional, sin backend) y navega a la sección Pedidos vía onPedirClick.
 // Sin encabezado global ni barra inferior: navegación push.
+// Reutiliza exclusivamente los datos del OrderItem existente (SampleArticles);
+// "Pedir" NO ejecuta ninguna acción (el flujo real de pedidos llega en un
+// slice futuro). Sin encabezado global ni barra inferior: navegación push.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleDetailScreen(
@@ -242,6 +245,9 @@ fun ArticleDetailScreen(
                         PedidosLocalState.pedir(order)
                         onPedirClick()
                     },
+                // Botón principal: visible en pantalla, SIN acción funcional
+                Button(
+                    onClick = { },
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = EnverGreen),
                     modifier = Modifier
