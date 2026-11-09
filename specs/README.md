@@ -9,7 +9,7 @@
 | `ENVER-SISTEMA/` | **Spec maestra** del sistema completo (superficies [IMPL]/[PEND]/[POR DEFINIR], arquitectura, integraciones, criterios) | Aprobada como referencia viva (2026-11-08); no sustituye specs por feature |
 | `CI-CD/` | Controles de integración ([CONFIG] vs [PROP]) y paso mínimo para primer pipeline | Documento de alcance; NADA de pipeline implementado |
 | `APIs/` | Estructura/listado para specs por contrato de backend | **PENDIENTE de URL AWS con los contratos reales** (no se inventan endpoints) |
-| `FT-01..FT-03/` | Features concretos (spec/plan/tasks + evidencia por tarea) | FT-01 y FT-02 han sido implementados y verificados; FT-03 ha sido implementado |
+| `FT-01..FT-04/` | Features concretos (spec/plan/tasks + evidencia por tarea) | FT-01–FT-04 implementados y verificados (compilación; runtime pendiente de dispositivo) |
 
 ## Estructura por feature (vigente desde FT-02)
 

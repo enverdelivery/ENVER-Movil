@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import com.uttt.enverdelivery.app.ui.components.media.EnverImage
 import com.uttt.enverdelivery.app.ui.components.media.ImageSource
 import com.uttt.enverdelivery.app.ui.screens.home.SampleArticles
+import com.uttt.enverdelivery.app.ui.screens.pedidos.PedidosLocalState
 import com.uttt.enverdelivery.app.ui.theme.EnverBadgeBg
 import com.uttt.enverdelivery.app.ui.theme.EnverBackground
 import com.uttt.enverdelivery.app.ui.theme.EnverCardBg
@@ -47,14 +48,16 @@ import com.uttt.enverdelivery.app.ui.theme.EnverTextMuted
 import com.uttt.enverdelivery.app.ui.theme.EnverTheme
 
 // Detalle de artículo (FT-02): push full-screen desde la tarjeta de Home.
-// Reutiliza exclusivamente los datos del OrderItem existente (SampleArticles);
-// "Pedir" NO ejecuta ninguna acción (el flujo real de pedidos llega en un
-// slice futuro). Sin encabezado global ni barra inferior: navegación push.
+// Reutiliza exclusivamente los datos del OrderItem existente (SampleArticles).
+// "Pedir" (FT-04): registra el artículo como pedido local en memoria (demo
+// provisional, sin backend) y navega a la sección Pedidos vía onPedirClick.
+// Sin encabezado global ni barra inferior: navegación push.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleDetailScreen(
     articleId: String,
     onBackClick: () -> Unit,
+    onPedirClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val order = SampleArticles.byId(articleId)
@@ -232,9 +235,13 @@ fun ArticleDetailScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Botón principal: visible en pantalla, SIN acción funcional
+                // Botón principal: registra el pedido local con los datos reales del
+                // artículo (dedup por id: el 2.º toque no duplica) y lleva a Pedidos
                 Button(
-                    onClick = { },
+                    onClick = {
+                        PedidosLocalState.pedir(order)
+                        onPedirClick()
+                    },
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = EnverGreen),
                     modifier = Modifier
