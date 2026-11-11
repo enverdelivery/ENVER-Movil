@@ -7,9 +7,12 @@
 | Carpeta | Qué contiene | Estado |
 |---|---|---|
 | `ENVER-SISTEMA/` | **Spec maestra** del sistema completo (superficies [IMPL]/[PEND]/[POR DEFINIR], arquitectura, integraciones, criterios) | Aprobada como referencia viva (2026-11-08); no sustituye specs por feature |
-| `CI-CD/` | Controles de integración ([CONFIG] vs [PROP]) y paso mínimo para primer pipeline | Documento de alcance; NADA de pipeline implementado |
+| `FIX-estabilizacion-main/` | Spec del fix de restos de fusiones duplicados en `main` (4 archivos, −24 líneas) | Implementado y verificado localmente (Checkpoint 4.7 §1); pendiente PR |
+| `CI-CD/` | Controles de integración ([CONFIG] vs [PROP]) + `plan.md` con tareas y verificación real | Pipeline implementado en Checkpoint 4.7 (`.github/workflows/ci.yml`); **NO VERIFICADO en GitHub Actions aún** |
 | `APIs/` | Estructura/listado para specs por contrato de backend | **PENDIENTE de URL AWS con los contratos reales** (no se inventan endpoints) |
 | `FT-01..FT-03/` | Features concretos (spec/plan/tasks + evidencia por tarea) | FT-01 y FT-02 han sido implementados y verificados; FT-03 ha sido implementado |
+| `FT-04..FT-05/` | Pedidos locales (demo) y Perfil | Implementados, fusionados a `main` (PR #4/#5, Nov 9) |
+| `FT-06-auth-preparacion/` | Validación Login/Registro, medidor dinámico, aviso de privacidad, `AuthRepository` honesto | Implementado en Checkpoint 4.7; pendiente PR; integración AWS real PENDIENTE de contrato |
 
 ## Estructura por feature (vigente desde FT-02)
 
