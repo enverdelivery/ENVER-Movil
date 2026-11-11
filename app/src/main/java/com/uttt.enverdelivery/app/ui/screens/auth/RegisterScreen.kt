@@ -19,9 +19,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
+import com.uttt.enverdelivery.app.data.AuthRepositoryPendienteDeContrato
+import kotlinx.coroutines.launch
+import com.uttt.enverdelivery.app.data.ResultadoAutenticacion
 import com.uttt.enverdelivery.app.ui.theme.EnverBackground
 import com.uttt.enverdelivery.app.ui.theme.EnverBadgeBg
 import com.uttt.enverdelivery.app.ui.theme.EnverDarkGreen
@@ -30,6 +35,9 @@ import com.uttt.enverdelivery.app.ui.theme.EnverInputBg
 import com.uttt.enverdelivery.app.ui.theme.EnverTextMuted
 
 class Country(val label: String, val emoji: String, val dialCode: String)
+
+// Aviso de privacidad oficial del proyecto (Checkpoint 4.7): única URL permitida.
+const val AVISO_PRIVACIDAD_URL = "https://enverdelivery.github.io/AvisoDePrivacidad/"
 
 private val COUNTRIES = listOf(
     Country("México", "🇲🇽", "+52"),
@@ -56,6 +64,12 @@ fun RegisterScreen(
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
     var termsAccepted by remember { mutableStateOf(false) }
+    // FT-06: indicador dinámico + estado honesto de integración pendiente.
+    val nivelSeguridad = ValidacionEntrada.evaluarNivelDeSeguridad(password)
+    var mensajeEstado by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+    val authRepository = remember { AuthRepositoryPendienteDeContrato() }
+    val contexto = LocalContext.current
 
     var selectedCountry by remember { mutableStateOf(COUNTRIES.first()) }
     var countryMenuExpanded by remember { mutableStateOf(false) }
@@ -438,24 +452,36 @@ fun RegisterScreen(
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                // Medidor de seguridad de contraseña (4 barritas)
+                // Medidor de seguridad de contraseña (4 barritas, dinámico FT-06)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(text = "Nivel de seguridad", fontSize = 10.sp, color = EnverTextMuted, fontWeight = FontWeight.SemiBold)
-                    Text(text = "Media", fontSize = 10.sp, color = Color(0xFFD97706), fontWeight = FontWeight.Bold)
+                    Text(
+                        text = ValidacionEntrada.etiquetaDeNivel(nivelSeguridad),
+                        fontSize = 10.sp,
+                        color = if (nivelSeguridad >= 3) EnverDarkGreen else Color(0xFFD97706),
+                        fontWeight = FontWeight.Bold
+                    )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    Box(modifier = Modifier.weight(1f).height(4.dp).background(EnverGreen, RoundedCornerShape(2.dp)))
-                    Box(modifier = Modifier.weight(1f).height(4.dp).background(EnverGreen, RoundedCornerShape(2.dp)))
-                    Box(modifier = Modifier.weight(1f).height(4.dp).background(EnverGreen, RoundedCornerShape(2.dp)))
-                    Box(modifier = Modifier.weight(1f).height(4.dp).background(Color(0xFFE2E8F0), RoundedCornerShape(2.dp)))
+                    repeat(4) { barra ->
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(4.dp)
+                                .background(
+                                    if (barra < nivelSeguridad) EnverGreen else Color(0xFFE2E8F0),
+                                    RoundedCornerShape(2.dp)
+                                )
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(14.dp))
@@ -480,11 +506,25 @@ fun RegisterScreen(
                             lineHeight = 14.sp
                         )
                         Spacer(modifier = Modifier.height(2.dp))
+                        // FT-06: sólo ABRE el aviso en el navegador (consultar);
+                        // la aceptación es la casilla, no la lectura de la página.
                         Text(
                             text = "🌐 Consultar Aviso de Privacidad Estudiantil",
                             fontSize = 10.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = EnverDarkGreen
+                            color = EnverDarkGreen,
+                            modifier = Modifier.clickable {
+                                val intento = android.content.Intent(
+                                    android.content.Intent.ACTION_VIEW,
+                                    android.net.Uri.parse(AVISO_PRIVACIDAD_URL)
+                                )
+                                contexto.startActivity(
+                                    android.content.Intent.createChooser(
+                                        intento,
+                                        "Abrir Aviso de Privacidad"
+                                    )
+                                )
+                            }
                         )
                     }
                 }
@@ -498,7 +538,41 @@ fun RegisterScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Button(
-                    onClick = onSubmitClick,
+                    onClick = {
+                        mensajeEstado = when {
+                            !ValidacionEntrada.noVacio(fullName) ->
+                                "Escribe tu nombre completo."
+                            !ValidacionEntrada.esEmailValido(email) ->
+                                "Escribe un correo electrónico válido."
+                            !ValidacionEntrada.esTelefonoValido(phone) ->
+                                "Escribe un teléfono móvil válido (8 a 15 dígitos)."
+                            !ValidacionEntrada.noVacio(password) ->
+                                "Escribe una contraseña."
+                            !termsAccepted ->
+                                "Debes aceptar el Aviso de Privacidad y los Términos para crear tu cuenta."
+                            else -> ""
+                        }
+                        if (mensajeEstado.isEmpty()) {
+                            // Registro localmente válido; el resultado real lo dará el
+                            // servidor (pendiente de contrato): hoy el repositorio
+                            // devuelve el aviso honesto y NO se navega a éxito simulado.
+                            scope.launch {
+                                val resultado = authRepository.registrarCuenta(
+                                    fullName.trim(),
+                                    email.trim(),
+                                    phone.trim(),
+                                    password
+                                )
+                                if (resultado is ResultadoAutenticacion.Error) {
+                                    mensajeEstado = resultado.mensaje
+                                } else {
+                                    // Exito real (futuro): se navegará vía onSubmitClick.
+                                    mensajeEstado = ""
+                                    onSubmitClick()
+                                }
+                            }
+                        }
+                    },
                     shape = RoundedCornerShape(25.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = EnverGreen),
                     modifier = Modifier
@@ -510,6 +584,18 @@ fun RegisterScreen(
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
+                    )
+                }
+
+                // Mensaje de estado honesto (validación local / integración pendiente)
+                if (mensajeEstado.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = mensajeEstado,
+                        fontSize = 11.sp,
+                        color = Color(0xFFDC2626),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
 
