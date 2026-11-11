@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
 import com.uttt.enverdelivery.app.data.AuthRepositoryPendienteDeContrato
 import kotlinx.coroutines.launch
 import com.uttt.enverdelivery.app.data.ResultadoAutenticacion
@@ -516,7 +517,7 @@ fun RegisterScreen(
                             modifier = Modifier.clickable {
                                 val intento = android.content.Intent(
                                     android.content.Intent.ACTION_VIEW,
-                                    android.net.Uri.parse(AVISO_PRIVACIDAD_URL)
+                                    AVISO_PRIVACIDAD_URL.toUri()
                                 )
                                 contexto.startActivity(
                                     android.content.Intent.createChooser(
