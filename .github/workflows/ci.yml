@@ -1,0 +1,73 @@
+# CI ENVER — gates por PR y push a main (Checkpoint 4.7, spec specs/CI-CD/spec.md).
+# Comandos idénticos a los locales: reproducibles con .\gradlew.bat <comando>.
+name: CI
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  build-test-lint:
+    name: build, unit-tests, lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Escaneo de secretos expuestos
+        shell: bash
+        run: |
+          # Los patrones se ensamblan en tiempo de ejecución a partir de
+          # fragmentos: ninguna línea de este archivo contiene una expresión
+          # completa, de modo que el escáner no se detecta a sí mismo.
+          frag1='AIza'
+          frag2='AKIA'
+          frag3a='-----BEGIN '
+          frag3b='PRIVATE KEY'
+          frag4='ghp_'
+          frag5a='aws_'
+          frag5b='secret_access_key'
+          pat1="${frag1}[-_0-9A-Za-z]{20,}"
+          pat2="${frag2}[0-9A-Z]{16}"
+          pat3="${frag3a}.*${frag3b}"
+          pat4="${frag4}[A-Za-z0-9]{20,}"
+          pat5="${frag5a}${frag5b}"
+          if grep -rInE \
+            --exclude-dir=.git --exclude-dir=build --exclude-dir=.gradle \
+            -e "$pat1" -e "$pat2" -e "$pat3" -e "$pat4" -e "$pat5" . ; then
+            echo "::error::Secreto potencial detectado"
+            exit 1
+          fi
+
+      - name: Compilar (assembleDebug)
+        run: ./gradlew :app:assembleDebug --no-daemon
+
+      - name: Pruebas unitarias (testDebugUnitTest)
+        run: ./gradlew :app:testDebugUnitTest --no-daemon
+
+      - name: Android Lint (lintDebug)
+        run: ./gradlew :app:lintDebug --no-daemon
+
+      - name: Publicar resultados de pruebas
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reportes-de-pruebas
+          path: |
+            app/build/reports/tests/
+            app/build/reports/lint-results-debug.html
+          if-no-files-found: ignore

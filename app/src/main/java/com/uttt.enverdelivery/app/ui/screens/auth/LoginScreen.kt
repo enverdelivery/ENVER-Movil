@@ -24,6 +24,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
+import com.uttt.enverdelivery.app.data.AuthRepositoryPendienteDeContrato
+import kotlinx.coroutines.launch
+import com.uttt.enverdelivery.app.data.ResultadoAutenticacion
 import com.uttt.enverdelivery.app.ui.theme.EnverBackground
 import com.uttt.enverdelivery.app.ui.theme.EnverCardBg
 import com.uttt.enverdelivery.app.ui.theme.EnverDarkGreen
@@ -40,6 +43,10 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
+    // FT-06: mensaje de estado (error local / error de integración pendiente).
+    var mensajeEstado by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+    val authRepository = remember { AuthRepositoryPendienteDeContrato() }
 
     Box(
         modifier = Modifier
@@ -247,9 +254,35 @@ fun LoginScreen(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // BOTÓN PRINCIPAL
+                    // BOTÓN PRINCIPAL: valida campos localmente y consulta el
+                    // repositorio (hoy: integración pendiente → error honesto;
+                    // sin navegación ni éxito simulado).
                     Button(
-                        onClick = { onLoginClick(email, password) },
+                        onClick = {
+                            mensajeEstado = when {
+                                !ValidacionEntrada.esEmailValido(email) ->
+                                    "Escribe un correo electrónico válido."
+                                !ValidacionEntrada.noVacio(password) ->
+                                    "Escribe tu contraseña."
+                                else -> ""
+                            }
+                            if (mensajeEstado.isEmpty()) {
+                                // Envío único por pulsación: se evalúa el estado actual;
+                                // cuando exista contrato se añadirá el bloqueo por
+                                // solicitud en curso con la llamada real.
+                                scope.launch {
+                                    val resultado =
+                                        authRepository.iniciarSesion(email.trim(), password)
+                                    if (resultado is ResultadoAutenticacion.Error) {
+                                        mensajeEstado = resultado.mensaje
+                                    } else {
+                                        // Exito real (futuro): se navegará vía onLoginClick.
+                                        mensajeEstado = ""
+                                        onLoginClick(email.trim(), password)
+                                    }
+                                }
+                            }
+                        },
                         shape = RoundedCornerShape(25.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = EnverGreen),
                         modifier = Modifier
@@ -269,6 +302,18 @@ fun LoginScreen(
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(text = "→", fontSize = 16.sp, color = Color.White)
                         }
+                    }
+
+                    // Mensaje de estado honesto (validación local / integración pendiente)
+                    if (mensajeEstado.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = mensajeEstado,
+                            fontSize = 12.sp,
+                            color = Color(0xFFDC2626),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
             }
