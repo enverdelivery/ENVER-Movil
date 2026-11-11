@@ -77,3 +77,17 @@ Al terminar una tarea:
 ## 7. Límites de los agentes declarados vs técnicas
 
 - Las restricciones de esta guía y de los prompts de `.opencode/agents/` son **de comportamiento**. La única "barrera técnica" disponible hoy es: revisiones de git diff, permisos opencode para agentes revisores (`edit`/`bash`/`task: deny`; solo lectura), y la aprobación humana. No prometas aislamiento donde no lo hay — la constitución (§D) lo establece.
+
+## 8. Verificación obligatoria al cerrar cada bloque funcional (Checkpoint 4.7)
+
+Al finalizar cada bloque funcional, el agente DEBE ejecutar esta secuencia y registrar el resultado real (nada se declara "pasado" sin evidencia):
+
+1. **Revisar el diff** (`git diff`/`status`) y comprobar que no hay cambios fuera del alcance del bloque.
+2. **Compilar y probar**: `.\gradlew.bat :app:assembleDebug` + las pruebas pertinentes al cambio (unitarias si hay lógica nueva; instrumentadas solo si hay dispositivo).
+3. **Análisis estático y seguridad disponibles**: lint cuando aplique, escaneo de secretos en el diff y archivos nuevos; sin logs con credenciales/PII.
+4. **Corregir errores introducidos por el cambio** (los preexistentes se reportan por separado, no se corrigen sin autorización).
+5. **Registrar** qué pasó, falló o NO pudo ejecutarse y por qué (comando + salida o causa).
+6. **Actualizar** spec/tasks de la funcionalidad y `Memoria.md` cuando corresponda.
+7. **Confirmar que está listo para revisión** antes de publicar (sin push directo a `main`; PR según ruleset).
+
+Proporcionalidad: los comandos costosos (`lintDebug`, suites completas) se ejecutan al cerrar el bloque y antes de integrar; los cambios de una línea requieren como mínimo build + diff revisado. El pipeline de CI (`.github/workflows/ci.yml`) ejecuta los mismos comandos en PR y push a `main`; los resultados de GitHub se citan solo cuando existan.
