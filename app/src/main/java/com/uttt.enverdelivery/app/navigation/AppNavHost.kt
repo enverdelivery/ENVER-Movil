@@ -79,14 +79,6 @@ fun AppNavHost(
                     seccionPedidosPendiente = true
                     navigationActions.returnFromDetail()
                 }
-                onArticleClick = navigationActions::navigateToArticleDetail
-            )
-        }
-        composable(NavRoutes.ARTICLE_DETAIL) { backStackEntry ->
-            // Detalle FT-02: push full-screen; volver = popBackStack (regresa a Home)
-            ArticleDetailScreen(
-                articleId = backStackEntry.arguments?.getString("articleId").orEmpty(),
-                onBackClick = navigationActions::returnFromDetail
             )
         }
     }

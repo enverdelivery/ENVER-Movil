@@ -5,9 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -136,10 +133,6 @@ private fun PedidoRow(pedido: OrderItem) {
 // Estado vacío original (FT-03), sin cambios respecto a lo aprobado.
 @Composable
 private fun PedidosEstadoVacio(modifier: Modifier = Modifier) {
-// Sección "Pedidos" del MainScaffold: estado vacío honesto mientras no existan
-// pedidos reales (sin datos inventados ni estados simulados).
-@Composable
-fun PedidosScreen(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -161,7 +154,6 @@ fun PedidosScreen(modifier: Modifier = Modifier) {
             Surface(
                 color = EnverCardBg,
                 shape = RoundedCornerShape(16.dp),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
@@ -175,7 +167,6 @@ fun PedidosScreen(modifier: Modifier = Modifier) {
                     Surface(
                         color = EnverBadgeBg,
                         shape = CircleShape
-                        shape = androidx.compose.foundation.shape.CircleShape
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.Receipt,
