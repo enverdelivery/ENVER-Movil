@@ -31,8 +31,24 @@ jobs:
       - name: Escaneo de secretos expuestos
         shell: bash
         run: |
-          if grep -rInE '(AIza[0-9A-Za-z_-]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----|ghp_[A-Za-z0-9]{20,}|aws_secret_access_key)' \
-            --exclude-dir=.git --exclude-dir=build --exclude-dir=.gradle . ; then
+          # Los patrones se ensamblan en tiempo de ejecución a partir de
+          # fragmentos: ninguna línea de este archivo contiene una expresión
+          # completa, de modo que el escáner no se detecta a sí mismo.
+          frag1='AIza'
+          frag2='AKIA'
+          frag3a='-----BEGIN '
+          frag3b='PRIVATE KEY'
+          frag4='ghp_'
+          frag5a='aws_'
+          frag5b='secret_access_key'
+          pat1="${frag1}[-_0-9A-Za-z]{20,}"
+          pat2="${frag2}[0-9A-Z]{16}"
+          pat3="${frag3a}.*${frag3b}"
+          pat4="${frag4}[A-Za-z0-9]{20,}"
+          pat5="${frag5a}${frag5b}"
+          if grep -rInE \
+            --exclude-dir=.git --exclude-dir=build --exclude-dir=.gradle \
+            -e "$pat1" -e "$pat2" -e "$pat3" -e "$pat4" -e "$pat5" . ; then
             echo "::error::Secreto potencial detectado"
             exit 1
           fi
